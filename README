@@ -1,0 +1,18 @@
+triangle
+    https://learnopengl-cn.github.io/01%20Getting%20started/04%20Hello%20Triangle/
+
+two-triangle
+    1. 窗口左上角与右下角各绘制一个三角形
+    2. 使用uniform结合qt的setUniformValue更改颜色
+    3. 使用混合函数GL_BLEND测试透明效果
+
+rectangle
+    1. 通过绘制两个三角形绘制矩形
+    2. 利用索引缓冲对象EBO绘制
+    https://learnopengl-cn.github.io/01%20Getting%20started/04%20Hello%20Triangle/#_10
+
+triangle2
+    1. 在着色器代码内设定location
+    2. 位置着色器内使用更多属性，包含位置与对应颜色，并输出颜色到片段着色器
+    3. glVertexAttribPointer 步长与偏移变量的设置
+    4. https://learnopengl-cn.github.io/01%20Getting%20started/05%20Shaders/#_5
