@@ -16,3 +16,11 @@ triangle2
     2. 位置着色器内使用更多属性，包含位置与对应颜色，并输出颜色到片段着色器
     3. glVertexAttribPointer 步长与偏移变量的设置
     4. https://learnopengl-cn.github.io/01%20Getting%20started/05%20Shaders/#_5
+
+texture
+    1. 基本的纹理练习
+    2. 使用两个shader program绘制三角形与木箱
+
+texture2
+    1. 纹理的基本参数练习
+    2. 运行时生成shader program
