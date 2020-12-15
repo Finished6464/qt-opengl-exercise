@@ -1,6 +1,6 @@
 环境
 #64-Ubuntu SMP Wed Dec 9 08:16:25 UTC 2020
-Using Qt version 5.14.2 in /opt/Qt5.14.2/5.14.2/gcc_64/lib
+Using Qt version 5.14.2
 
 triangle
     https://learnopengl-cn.github.io/01%20Getting%20started/04%20Hello%20Triangle/
@@ -28,3 +28,6 @@ texture
 texture2
     1. 纹理的基本参数练习
     2. 运行时生成shader program
+
+yuv
+    通过opengl转换并显示一个I420格式的YUV文件
