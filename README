@@ -2,6 +2,9 @@
 #64-Ubuntu SMP Wed Dec 9 08:16:25 UTC 2020
 Using Qt version 5.14.2
 
+sample:
+    一些样本文件
+
 triangle
     https://learnopengl-cn.github.io/01%20Getting%20started/04%20Hello%20Triangle/
 
