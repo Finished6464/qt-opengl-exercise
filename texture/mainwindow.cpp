@@ -115,6 +115,7 @@ void TriangleShaderProgram::Render(QOpenGLFunctions *func)
 
     func->glDrawArrays(GL_TRIANGLES, 0, 3);
 
+
     program_->release();
     vao_->release();
     texture_->release();
