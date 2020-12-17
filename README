@@ -37,3 +37,6 @@ yuv
 
 freetype
     通过FreeType库显示文本
+
+yuv-freetype
+    yuv + freetype 显示I420格式的YUV文件，并叠加文本
