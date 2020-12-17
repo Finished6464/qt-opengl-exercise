@@ -16,8 +16,8 @@ public:
     ShaderProgram();
     virtual ~ShaderProgram();
 
-    virtual void Init(QOpenGLFunctions *func) = 0;
-    virtual void Render(QOpenGLFunctions *func) = 0;
+    virtual void Init() = 0;
+    virtual void Render() = 0;
 
 protected:
     QOpenGLShaderProgram *program_;
@@ -30,8 +30,8 @@ class TriangleShaderProgram : public ShaderProgram
 public:
     TriangleShaderProgram();
 
-    void Init(QOpenGLFunctions *func);
-    void Render(QOpenGLFunctions *func);
+    void Init();
+    void Render();
 };
 
 class ContainerShaderProgram : public ShaderProgram
@@ -39,8 +39,8 @@ class ContainerShaderProgram : public ShaderProgram
 public:
     ContainerShaderProgram();
 
-    void Init(QOpenGLFunctions *func);
-    void Render(QOpenGLFunctions *func);
+    void Init();
+    void Render();
 };
 
 

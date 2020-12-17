@@ -2,7 +2,7 @@
 #64-Ubuntu SMP Wed Dec 9 08:16:25 UTC 2020
 Using Qt version 5.14.2
 
-sample:
+sample
     一些样本文件
 
 triangle
@@ -34,3 +34,6 @@ texture2
 
 yuv
     通过opengl转换并显示一个I420格式的YUV文件
+
+freetype
+    通过FreeType库显示文本

@@ -31,8 +31,9 @@ TriangleShaderProgram::TriangleShaderProgram()
 }
 
 
-void TriangleShaderProgram::Init(QOpenGLFunctions *func)
+void TriangleShaderProgram::Init()
 {
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     const char *vertexShaderSourceCore =
         "layout (location = 0) in vec3 aPos;\n"   // 位置变量的属性位置值为 0
         "layout (location = 1) in vec2 aTexCoord;\n" //纹理坐标的属性位置值为 1
@@ -82,13 +83,13 @@ void TriangleShaderProgram::Init(QOpenGLFunctions *func)
     // 参看纹理教程https://learnopengl-cn.github.io/01%20Getting%20started/06%20Textures/#_6
     // 步长为5 (vertices 顶点位置3个float + 纹理坐标2个float)
     // 位置属性(顶点着色器代码内已定义 location = 0) layout (location = 0) in vec3 aPos;
-    func->glEnableVertexAttribArray(0);
-    func->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
+    f->glEnableVertexAttribArray(0);
+    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
 
     // 纹理坐标属性(顶点着色器代码内已定义 location = 1) layout (location = 1) in vec3 aColor;
     // 纹理坐标的每组索引需偏移3个float(3个顶点位置)
-    func->glEnableVertexAttribArray(1);
-    func->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3* sizeof(GLfloat)));
+    f->glEnableVertexAttribArray(1);
+    f->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3* sizeof(GLfloat)));
 
     texture_ = new QOpenGLTexture(QImage("wall.jpg"));
     // 为当前绑定的纹理对象设置环绕、过滤方式
@@ -105,15 +106,15 @@ void TriangleShaderProgram::Init(QOpenGLFunctions *func)
     delete vbo;
 }
 
-void TriangleShaderProgram::Render(QOpenGLFunctions *func)
+void TriangleShaderProgram::Render()
 {
-//    Q_UNUSED( func )
-    func->glActiveTexture(GL_TEXTURE0);
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+    f->glActiveTexture(GL_TEXTURE0);
     texture_->bind();
     vao_->bind();
     program_->bind();
 
-    func->glDrawArrays(GL_TRIANGLES, 0, 3);
+    f->glDrawArrays(GL_TRIANGLES, 0, 3);
 
 
     program_->release();
@@ -127,8 +128,9 @@ ContainerShaderProgram::ContainerShaderProgram()
 }
 
 
-void ContainerShaderProgram::Init(QOpenGLFunctions *func)
+void ContainerShaderProgram::Init()
 {
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     const char *vertext_shader_source =
         "layout (location = 0) in vec3 aPos;\n"   // 位置变量的属性位置值为 0
         "layout (location = 1) in vec3 aColor;\n" // 颜色变量的属性位置值为 1
@@ -196,18 +198,18 @@ void ContainerShaderProgram::Init(QOpenGLFunctions *func)
     // 参看纹理教程https://learnopengl-cn.github.io/01%20Getting%20started/06%20Textures/#_6
     // 步长为8 (vertices 顶点位置3个float + 颜色3个float + 纹理坐标2个float)
     // 位置属性(顶点着色器代码内已定义 location = 0) layout (location = 0) in vec3 aPos;
-    func->glEnableVertexAttribArray(0);
-    func->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
+    f->glEnableVertexAttribArray(0);
+    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
 
     // 颜色属性(顶点着色器代码内已定义 location = 1) layout (location = 1) in vec3 aColor;
     // 颜色的每组索引需偏移3个float(3个顶点位置)
-    func->glEnableVertexAttribArray(1);
-    func->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3* sizeof(GLfloat)));
+    f->glEnableVertexAttribArray(1);
+    f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3* sizeof(GLfloat)));
 
     // 纹理坐标属性(顶点着色器代码内已定义 location = 1) layout (location = 1) in vec3 aColor;
     // 纹理坐标的每组索引需偏移6个float(3个顶点位置 + 3个颜色)
-    func->glEnableVertexAttribArray(2);
-    func->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6* sizeof(GLfloat)));
+    f->glEnableVertexAttribArray(2);
+    f->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6* sizeof(GLfloat)));
 
     SAFE_DELETE(texture_);
 //    texture_ = new QOpenGLTexture(QOpenGLTexture::Target2D);
@@ -225,7 +227,7 @@ void ContainerShaderProgram::Init(QOpenGLFunctions *func)
 //    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img->width(), img->height(), 0, GL_RGB, GL_UNSIGNED_BYTE, img->constBits());
 //    glGenerateMipmap(GL_TEXTURE_2D);
 
-    func->glUniform1i(program_->uniformLocation("texture1"), 0); // 手动设置
+    f->glUniform1i(program_->uniformLocation("texture1"), 0); // 手动设置
 //    func->glUniform1i(program_->uniformLocation("texture2"), 1);
 
     program_->release();
@@ -234,14 +236,15 @@ void ContainerShaderProgram::Init(QOpenGLFunctions *func)
     delete ebo;
 }
 
-void ContainerShaderProgram::Render(QOpenGLFunctions *func)
+void ContainerShaderProgram::Render()
 {
-    func->glActiveTexture(GL_TEXTURE0);
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+    f->glActiveTexture(GL_TEXTURE0);
     texture_->bind();
     vao_->bind();
     program_->bind();
 
-    func->glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    f->glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     program_->release();
     vao_->release();
@@ -271,11 +274,11 @@ void MainWindow::initializeGL()
 
     SAFE_DELETE(triangle_shader_prog_);
     triangle_shader_prog_ = new TriangleShaderProgram;
-    triangle_shader_prog_->Init(this);
+    triangle_shader_prog_->Init();
 
     SAFE_DELETE(container_shader_prog_);
     container_shader_prog_ = new ContainerShaderProgram;
-    container_shader_prog_->Init(this);
+    container_shader_prog_->Init();
 }
 
 void MainWindow::paintGL()
@@ -284,10 +287,10 @@ void MainWindow::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (triangle_shader_prog_) {
-        triangle_shader_prog_->Render(this);
+        triangle_shader_prog_->Render();
     }
 
     if (container_shader_prog_) {
-        container_shader_prog_->Render(this);
+        container_shader_prog_->Render();
     }
 }

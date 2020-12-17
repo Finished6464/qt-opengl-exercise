@@ -50,11 +50,11 @@ MainWindow::~MainWindow()
 void MainWindow::initializeGL()
 {
     const char *vertexShaderSource =
-        "layout (location = 0) in vec2 posIn;\n"
+        "layout (location = 0) in vec4 posIn;\n"
         "layout (location = 1) in vec2 textureIn;\n"
         "out vec2 textureCoord;\n"
         "void main(void) {\n"
-        "    gl_Position = vec4(posIn, 0, 1.0);\n"
+        "    gl_Position = posIn;\n"
         "    textureCoord = textureIn;\n"
         "}\n";
 
@@ -114,7 +114,7 @@ void MainWindow::initializeGL()
     vbo = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     vbo->create();
     vbo->bind();
-    vbo->setUsagePattern(QOpenGLBuffer::StreamDraw);
+    vbo->setUsagePattern(QOpenGLBuffer::DynamicDraw);
     vbo->allocate(vertices, sizeof(vertices));
 
     glEnableVertexAttribArray(0);
