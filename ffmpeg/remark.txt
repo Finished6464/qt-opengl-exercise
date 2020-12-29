@@ -1,0 +1,7 @@
+raspberry pi 4b
+res     fps   opengl  thread    frame/sec
+1080p   60    T         0       46
+1080p   60    F         0       81
+
+720p    30    T         0       59
+720p    30    F         0       157
