@@ -13,11 +13,13 @@ public:
     YUVRender();
     virtual ~YUVRender();
 
-    int Build(int width, int height);
+    int Build(int video_width, int video_height);
     void Unbuild();
-
-    void Render(const unsigned char* const buff);
-    void Render2(const unsigned char * const src_data[], const int src_linesize[]);
+    bool IsBulit() const { return is_built; }
+    void Resize();
+    void SetupPixel(const unsigned char *yuv_buff);
+    void SetupPixel(const unsigned char* const *data, const int *linesize);
+    void Draw();
 
 private:
     QOpenGLShaderProgram *program_;
@@ -26,7 +28,9 @@ private:
     QOpenGLTexture *texture_u_;
     QOpenGLTexture *texture_v_;
 
-    int width_, height_;
+    int video_width_, video_height_;
+
+    bool is_built;
 };
 
 #endif // YUVRENDER_H

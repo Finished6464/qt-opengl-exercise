@@ -160,7 +160,7 @@ void TextRender::Unbuild()
     }
 }
 
-void TextRender::Render(const QString& text, GLfloat x, GLfloat y, int font_height, GLfloat scale, const QColor &color)
+void TextRender::Draw(const QString& text, GLfloat x, GLfloat y, int font_height, GLfloat scale, const QColor &color)
 {
     int size = text.size();
     if (size > 0) {
@@ -168,12 +168,12 @@ void TextRender::Render(const QString& text, GLfloat x, GLfloat y, int font_heig
         for (int i = 0; i < text.size(); i++) {
             data[i] = text.at(i).unicode();
         }
-        Render(data, size, x, y, font_height, scale, color);
+        Draw(data, size, x, y, font_height, scale, color);
         free(data);
     }
 }
 
-void TextRender::Render(const ushort* charcodes, int size, GLfloat x, GLfloat y, int font_height, GLfloat scale, const QColor &color)
+void TextRender::Draw(const ushort* charcodes, int size, GLfloat x, GLfloat y, int font_height, GLfloat scale, const QColor &color)
 {
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     QMatrix4x4 matrix;

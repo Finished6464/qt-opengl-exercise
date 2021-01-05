@@ -15,7 +15,7 @@ static QByteArray versionedShaderCode(const char *src)
     QByteArray versionedSrc;
 
     if (QOpenGLContext::currentContext()->isOpenGLES())
-        versionedSrc.append(QByteArrayLiteral("#version 300 es\n"));
+        versionedSrc.append(QByteArrayLiteral("#version 310 es\n"));
     else
         versionedSrc.append(QByteArrayLiteral("#version 330\n"));
 

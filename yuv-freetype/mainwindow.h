@@ -16,9 +16,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private:
-    void initializeGL();
-    void paintGL();
+    void initializeGL() override;
+    void paintGL() override;
+    void resizeGL(int w, int h) override;
 
 private:
     TextRender *text_render_;
@@ -26,6 +30,8 @@ private:
 
     uchar* buff_;
     int buff_size_;
+
+    bool first_show_;
 };
 
 #endif // MAINWINDOW_H

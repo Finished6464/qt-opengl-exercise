@@ -22,8 +22,8 @@ public:
     int Build(const char*  filepathname);
     void Unbuild();
 
-    void Render(const QString& text, float x, float y, int font_height, float scale, const QColor &color);
-    void Render(const ushort* charcodes, int size, float x, float y, int font_height, float scale, const QColor &color);
+    void Draw(const QString& text, float x, float y, int font_height, float scale, const QColor &color);
+    void Draw(const ushort* charcodes, int size, float x, float y, int font_height, float scale, const QColor &color);
 
 private:
     static FT_Library ft_lib_;
