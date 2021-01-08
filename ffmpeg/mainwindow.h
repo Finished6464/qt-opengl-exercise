@@ -11,6 +11,7 @@
 
 class QMutex;
 class QElapsedTimer;
+class QSlider;
 
 class VideoDecodeThread: public QThread
 {
@@ -26,7 +27,7 @@ protected:
     void run() override;
 
 signals:
-    void frameready(const unsigned char* const *data, const int *linesize, int num, double t);
+    void frameready(const unsigned char* const *data, const int *linesize, int num);
 
 private:
     VideoDecoder *video_decoder_;
@@ -45,8 +46,7 @@ public:
 
     void BuildRender(int video_width, int video_height);
 
-public slots:
-    void OnRedraw(const unsigned char* const *data, const int *linesize, int num, double t);
+    void Render(const unsigned char* const *data, const int *linesize, int num, double t);
 
 protected:
     void initializeGL() override;
@@ -72,11 +72,14 @@ public slots:
     void OnOpenBtnClicked();
     void OnCloseBtnClicked();
 
+    void OnFrameReady(const unsigned char* const *data, const int *linesize, int num);
+
 private:
     VideoDecoder *video_decoder_;
     VideoWidget *video_widget_;
 
     VideoDecodeThread* decode_thread_;
 
+    QSlider* slider_;
 };
 #endif // MAINWINDOW_H

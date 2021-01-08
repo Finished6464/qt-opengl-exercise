@@ -226,8 +226,8 @@ void YUVRender::Resize()
     scale_x = video_width_ > viewport[2] ? viewport[2] / (float)video_width_ : 1.0f;
     scale_y = video_height_ > viewport[3] ? viewport[3] / (float)video_height_ : 1.0f;
     scale = scale_x < scale_y ? scale_x : scale_y;
-    qDebug("viewport: %d, %d", viewport[2], viewport[3]);
-    qDebug("scale: %f, %f, %f", scale_x, scale_y, scale);
+//    qDebug("viewport: %d, %d", viewport[2], viewport[3]);
+//    qDebug("scale: %f, %f, %f", scale_x, scale_y, scale);
 
     mt_scale.scale(scale * video_width_ / viewport[2],
             scale * video_height_ / viewport[3],

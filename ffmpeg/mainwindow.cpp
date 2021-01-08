@@ -28,9 +28,9 @@ MainWindow::MainWindow(QWidget *parent)
     video_widget_ = new VideoWidget(this);
     vlayout->addWidget(video_widget_);
 
-    QSlider* slider = new QSlider(Qt::Horizontal);
-    slider->setRange(1, 100);    
-    vlayout->addWidget(slider);
+    slider_ = new QSlider(Qt::Horizontal);
+    slider_->setRange(1, 100);
+    vlayout->addWidget(slider_);
 
     hlayout = new QHBoxLayout;
     btn  = new QPushButton("Open");
@@ -60,11 +60,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     decode_thread_ = new VideoDecodeThread(video_decoder_, this);
-    QObject::connect(decode_thread_, &VideoDecodeThread::frameready, video_widget_, &VideoWidget::OnRedraw);
-    QObject::connect(decode_thread_, &VideoDecodeThread::frameready, slider,
-                     [=](const unsigned char* const *, const int *, int) {
-        slider->setValue(video_decoder_->GetDuration() > 0 ? video_decoder_->GetFrameTime() * 100 / video_decoder_->GetDuration() : 0);
-    });
+    QObject::connect(decode_thread_, &VideoDecodeThread::frameready, this, &MainWindow::OnFrameReady);
+//    QObject::connect(decode_thread_, &VideoDecodeThread::frameready, slider,
+//                     [=](const unsigned char* const *, const int *, int) {
+//        slider->setValue(video_decoder_->GetDuration() > 0 ? video_decoder_->GetFrameTime() * 100 / video_decoder_->GetDuration() : 0);
+//    });
 
 
     this->resize(600,480);
@@ -94,7 +94,13 @@ void MainWindow::OnCloseBtnClicked()
     video_decoder_->Unload();
 }
 
-
+void MainWindow::OnFrameReady(const unsigned char* const *data, const int *linesize, int num)
+{
+    double frame_time = video_decoder_->GetFrameTime();
+    double duration = video_decoder_->GetDuration();
+    video_widget_->Render(data, linesize, num, frame_time);
+    slider_->setValue(duration > 0 ? frame_time * 100 / duration : 0);
+}
 
 
 VideoWidget::VideoWidget(QWidget *parent)
@@ -119,7 +125,7 @@ void VideoWidget::BuildRender(int video_width, int video_height)
     text_render_->Build("test.ttf");
 }
 
-void VideoWidget::OnRedraw(const unsigned char* const *data, const int *linesize, int, double t)
+void VideoWidget::Render(const unsigned char* const *data, const int *linesize, int, double t)
 {
     makeCurrent();
     yuv_render_->SetupPixel(data, linesize);
@@ -138,13 +144,10 @@ void VideoWidget::initializeGL()
 
 void VideoWidget::paintGL()
 {
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     yuv_render_->Draw();
-
-//    glViewport(0, 0, this->width(), this->height());
 
     if (!time_str_.isEmpty())
         text_render_->Draw(time_str_, size().width() - 150, 0.0f, 32, 1.0f, QColor(Qt::red));
@@ -203,6 +206,7 @@ void VideoDecodeThread::run()
     const unsigned char* const *data;
     const int *linesize;
     int num, ret, frame_num = 0;
+    double frame_time = 0;
     QElapsedTimer debug_et;
 
     debug_et.start();
@@ -211,26 +215,29 @@ void VideoDecodeThread::run()
     start_time_ = 0;
     et_->start();
     mutex_->unlock();
+
 //    et.start();
 //    qDebug("duration time: %f", video_decoder_->GetDuration());
     while (!this->isInterruptionRequested()) {
         if (!mutex_->tryLock())
             continue;
-        ret = video_decoder_->ReadFrame(&data, &linesize, &num);
-        mutex_->unlock();
-        frame_num++;
-//        qDebug("frame time: %f", video_decoder_->GetFrameTime());
-        emit frameready(data, linesize, num, video_decoder_->GetFrameTime());
+        ret = video_decoder_->ReadFrame(&data, &linesize, &num);        
+        if (ret == 0 || ret == AVERROR_EOF) {
+            frame_time = video_decoder_->GetFrameTime();
+            frame_num++;
+            mutex_->unlock();
+            emit frameready(data, linesize, num);
+        }
+        else {
+            mutex_->unlock();
+        }
 
         if (ret != 0)
             break;
 
         while (!this->isInterruptionRequested()) {
-            if (!mutex_->tryLock())
-                continue;
-            mutex_->unlock();
-            qint64 v = et_->elapsed();
-            if (start_time_ * 1000 + et_->elapsed() > (video_decoder_->GetFrameTime() - 0.3) * 1000) {
+//            qint64 v = et_->elapsed();
+            if (start_time_ * 1000 + et_->elapsed() > (frame_time - 0.3) * 1000) {
 //                qDebug("%d * 1000 + %lld > (%f - 0.3) * 1000", start_sec_, et_->elapsed(), frame_time);
                 break;
             }
@@ -238,9 +245,7 @@ void VideoDecodeThread::run()
         }
     }
 
-    mutex_->lock();
     qDebug("frame: %d time: %lld  per:%d/sec", frame_num, debug_et.elapsed(), frame_num * 1000 / (debug_et.elapsed()));
 //    qDebug("total time: %lld", et.elapsed());
     qDebug() << "VideoDecodeThread exited";
-    mutex_->unlock();
 }

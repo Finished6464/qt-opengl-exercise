@@ -40,3 +40,9 @@ freetype
 
 yuv-freetype
     yuv + freetype 显示I420格式的YUV文件，并叠加文本
+
+ffmpeg
+    结合ffmpeg
+
+videoplayer
+    yuv420p播放器测试
