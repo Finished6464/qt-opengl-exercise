@@ -5,7 +5,7 @@
 #include <QOpenGLFunctions>
 #include <QThread>
 
-#include "textrender.h"
+#include "../textrender.h"
 #include "../yuvrender.h"
 #include "videodecoder.h"
 
