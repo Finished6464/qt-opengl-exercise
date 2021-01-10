@@ -98,12 +98,12 @@ int TextRender::Build(const char*  filepathname)
         "    textCoord = textureIn;\n"
         "}\n";
     const char *fragmentShaderSource =
-        "in vec2 textCoord;\n"
-        "out vec4 fragmentColor;\n"
+        "in mediump vec2 textCoord;\n"
+        "out mediump vec4 fragmentColor;\n"
         "uniform sampler2D text;\n"
-        "uniform vec4 textColor;\n"
+        "uniform mediump vec4 textColor;\n"
         "void main(void) {\n"
-        "    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, textCoord).r);\n"
+        "    mediump vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, textCoord).r);\n"
         "    fragmentColor = textColor * sampled;\n"
         "}\n";
 
