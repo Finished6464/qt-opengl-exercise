@@ -46,3 +46,13 @@ ffmpeg
 
 videoplayer
     yuv420p播放器测试
+
+yuv-pbo
+    yuv + pbo 测试
+
+参考：
+https://blog.csdn.net/lixiaoguang20/article/details/62041513
+https://cloud.tencent.com/developer/article/1636045
+http://www.songho.ca/opengl/gl_pbo.html
+https://learnopengl-cn.github.io/
+
