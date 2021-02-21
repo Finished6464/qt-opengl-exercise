@@ -10,12 +10,13 @@
 #include <QMessageBox>
 #include <QOpenGLExtraFunctions>
 #include <QElapsedTimer>
+#include <QThread>
 
 #define SAFE_DELETE(p) do {if (p) {delete (p); (p) = nullptr;}} while(0)
 
-const char* YUV_FILE_PATH = "bbb_sunflower_1920_1080.yuv";
-const unsigned FRAME_WIDTH = 1920; //video frame width, hardcoded for PoC
-const unsigned FRAME_HEIGHT = 1080; //video frame height, hardcoded for PoC
+const char* YUV_FILE_PATH = "bbb_sunflower_480_270.yuv";
+const unsigned FRAME_WIDTH = 480; //video frame width, hardcoded for PoC
+const unsigned FRAME_HEIGHT = 270; //video frame height, hardcoded for PoC
 const unsigned FRAME_SIZE = FRAME_WIDTH * FRAME_HEIGHT * 3/2; //I420
 
 
@@ -30,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     texture_u_ = nullptr;
     texture_v_ = nullptr;
     buff_ = nullptr;
-//    vbo_ = nullptr;
+    pbo_ = nullptr;
 
     resize(600,480);
     move(QApplication::screens().at(0)->geometry().center() - frameGeometry().center());
@@ -41,7 +42,7 @@ MainWindow::~MainWindow()
     makeCurrent();
     SAFE_DELETE(program_);
     SAFE_DELETE(vao_);
-//    SAFE_DELETE(vbo_);
+    SAFE_DELETE(pbo_);
     SAFE_DELETE(texture_y_);
     SAFE_DELETE(texture_u_);
     SAFE_DELETE(texture_v_);
@@ -157,11 +158,34 @@ void MainWindow::initializeGL()
 
     QElapsedTimer et;
 
-    glGenBuffers(1, &pbo_);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_);
+//#define  _USE_PBO
+//#define  _USE_QT_PBO
+#ifdef _USE_PBO
+#ifdef _USE_QT_PBO
+    SAFE_DELETE(pbo_);
+    pbo_ = new QOpenGLBuffer(QOpenGLBuffer::PixelUnpackBuffer);
+    pbo_->create();
+    pbo_->bind();
+    pbo_->setUsagePattern(QOpenGLBuffer::StreamDraw);
+    pbo_->allocate(FRAME_SIZE);
+#ifdef _USE_MAP
+    void *bufPtr = pbo_->mapRange(0, FRAME_SIZE, QOpenGLBuffer::RangeWrite | QOpenGLBuffer::RangeInvalidateBuffer |  QOpenGLBuffer::RangeUnsynchronized);
+    et.start();
+    if (bufPtr) {
+        memcpy(bufPtr, buff_, FRAME_SIZE);
+        pbo_->unmap();
+        qDebug("memcpy use time: %lld", et.elapsed());
+    }
+#else
+    et.start();
+    pbo_->write(0, buff_, FRAME_SIZE);
+    qDebug("pbo_->write use time: %lld", et.elapsed());
+#endif //_USE_MAP
+#else
+    GLuint pbo;
+    glGenBuffers(1, &pbo);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
     glBufferData(GL_PIXEL_UNPACK_BUFFER, FRAME_SIZE, 0, GL_STREAM_DRAW);
-
-
     QOpenGLExtraFunctions* exf = QOpenGLContext::currentContext()->extraFunctions();
     GLubyte *bufPtr = (GLubyte *) exf->glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0,
                                                    FRAME_SIZE,
@@ -172,19 +196,31 @@ void MainWindow::initializeGL()
         exf->glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
         qDebug("memcpy use time: %lld", et.elapsed());
     }
-
+#endif   //_USE_QT_PBO
+#endif   //_USE_MAP
+    et.start();
     texture_y_->bind();
-////    qDebug("texture_y_->bind use time: %lld", et.elapsed());
+    qDebug("texture_y_->bind use time: %lld", et.elapsed());
+#ifdef _USE_PBO
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, FRAME_WIDTH, FRAME_HEIGHT, GL_RED, GL_UNSIGNED_BYTE, 0);
-//    qDebug("glTexImage2D y use time: %lld", et.elapsed());
+#else
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, FRAME_WIDTH, FRAME_HEIGHT, GL_RED, GL_UNSIGNED_BYTE, buff_);
+#endif
+    qDebug("glTexSubImage2D y use time: %lld", et.elapsed());
 
     texture_u_->bind();
+#ifdef _USE_PBO
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,  FRAME_WIDTH / 2, FRAME_HEIGHT / 2, GL_RED, GL_UNSIGNED_BYTE, (char*)(FRAME_WIDTH * FRAME_HEIGHT));
+#else
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,  FRAME_WIDTH / 2, FRAME_HEIGHT / 2, GL_RED, GL_UNSIGNED_BYTE, buff_ + FRAME_WIDTH * FRAME_HEIGHT);
+#endif
 
     texture_v_->bind();
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, FRAME_WIDTH / 2, FRAME_HEIGHT / 2, GL_RED, GL_UNSIGNED_BYTE, (char*)(FRAME_WIDTH * FRAME_HEIGHT * 5 / 4));
-
-//    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+#ifdef _USE_PBO
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,  FRAME_WIDTH / 2, FRAME_HEIGHT / 2, GL_RED, GL_UNSIGNED_BYTE, (char*)(FRAME_WIDTH * FRAME_HEIGHT * 5 / 4));
+#else
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,  FRAME_WIDTH / 2, FRAME_HEIGHT / 2, GL_RED, GL_UNSIGNED_BYTE, buff_ + FRAME_WIDTH * FRAME_HEIGHT * 5 / 4);
+#endif
 
     qDebug("use tim: %lld", et.elapsed());
 
@@ -197,8 +233,13 @@ void MainWindow::initializeGL()
 //    texture_y_->release();
 //    texture_u_->release();
 //    texture_v_->release();
-
+#if defined (_USE_PBO) && defined (_USE_QT_PBO)
+    pbo_->release();
+#else
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+#endif
     delete vbo;
+
 }
 
 void MainWindow::paintGL()

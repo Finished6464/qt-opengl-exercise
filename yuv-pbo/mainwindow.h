@@ -32,6 +32,6 @@ private:
     uchar* buff_;
     int buff_size_;
 
-    GLuint pbo_;
+    QOpenGLBuffer *pbo_;
 };
 #endif // MAINWINDOW_H
