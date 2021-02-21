@@ -49,6 +49,9 @@ videoplayer
 
 yuv-pbo
     yuv + pbo 测试
+    样本使用了1080P与2160P的文件；
+    pc下使用PBO， glTexSubImage2D可实现异步，耗时0MS，实现了DMA；
+    rasspberry pi 4b下运行测试，使用pbo比不使用pbo的情况下，glTexSubImage2D耗时近一倍，并没有实现异步，可能还是和硬件有关系。
 
 参考：
 https://blog.csdn.net/lixiaoguang20/article/details/62041513
