@@ -53,9 +53,14 @@ yuv-pbo
     pc下使用PBO， glTexSubImage2D可实现异步，耗时0MS，实现了DMA；
     rasspberry pi 4b下运行测试，使用pbo比不使用pbo的情况下，glTexSubImage2D耗时近一倍，并没有实现异步，可能还是和硬件有关系。
 
+yuv-fbo
+    yuv + fbo 测试
+
 参考：
 https://blog.csdn.net/lixiaoguang20/article/details/62041513
 https://cloud.tencent.com/developer/article/1636045
 http://www.songho.ca/opengl/gl_pbo.html
 https://learnopengl-cn.github.io/
-
+http://www.songho.ca/opengl/index.html
+https://dangelog.wordpress.com/2013/02/10/using-fbos-instead-of-pbuffers-in-qt-5-2/
+https://stackoverflow.com/questions/42734019/rendering-to-qopenglframebufferobject-without-paintgl-call
